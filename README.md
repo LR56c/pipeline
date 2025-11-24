@@ -48,7 +48,7 @@ Para replicar las pruebas en un entorno local, utilizar los siguientes comandos:
 ```bash
 # Compilar y ejecutar la aplicación
 mvn clean package -DskipTests
-java -jar target/automation-pipeline-1.0.0-SNAPSHOT.jar
+java -jar target/automation-pipeline-1.0.0-SNAPSHOT.jar --server.port=8090
 ```
 - Con Docker
 ```bash
