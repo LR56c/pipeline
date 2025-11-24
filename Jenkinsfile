@@ -26,7 +26,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 echo 'Ejecutando Pruebas de Integración...'
-                sh 'mvn verify -DskipUnitTests'
+                bat 'mvn verify -DskipUnitTests'
             }
         }
     }
