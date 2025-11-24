@@ -4,7 +4,10 @@ pipeline {
         maven 'Maven 3.8.6'
         jdk 'jdk11'
     }
-
+    environment {
+        IMAGE_NAME = "app-java"
+        CONTAINER_NAME = "staging-app"
+    }
     stages {
         stage('Build') {
             steps {
