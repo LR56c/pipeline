@@ -4,7 +4,10 @@ pipeline {
         maven 'Maven 3.8.6'
         jdk 'jdk11'
     }
-
+    environment {
+        IMAGE_NAME = "app-java"
+        CONTAINER_NAME = "staging-app"
+    }
     stages {
         stage('Build') {
             steps {
@@ -15,7 +18,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 echo 'Ejecutando Pruebas Unitarias...'
-                bat 'mvn test'
+                bat 'mvn test -Dtest=!RunCucumberTest'
             }
             post {
                 always {
@@ -26,8 +29,43 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 echo 'Ejecutando Pruebas de Integración...'
-                bat 'mvn verify -DskipUnitTests'
+                bat 'mvn verify -DskipUnitTests -Dtest=!RunCucumberTest'
             }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Desplegando contenedor en Staging'
+                script {
+                    bat "docker stop %CONTAINER_NAME% || exit 0"
+                    bat "docker rm %CONTAINER_NAME% || exit 0"
+                    bat "docker build -t %IMAGE_NAME%:v%BUILD_NUMBER% ."
+                    bat "docker run -d --name %CONTAINER_NAME% -p 8090:8080 %IMAGE_NAME%:v%BUILD_NUMBER%"
+                }
+            }
+        }
+        stage('Acceptance Tests') {
+            steps {
+                echo 'Esperando 10 segundos a que Spring Boot inicie completamente...'
+                sleep(time: 10, unit: "SECONDS")
+                bat 'mvn test -Dtest=RunCucumberTest'
+            }
+        }
+        stage('Deploy to Production') {
+            input {
+                message "Staging validado correctamente. ¿Autorizar pase a Producción?"
+                ok "Sí, Desplegar"
+            }
+            steps {
+                echo 'Desplegando en produccion'
+            }
+        }
+    }
+    post {
+        failure {
+            echo 'Iniciando Rollback'
+        }
+        success {
+            echo 'Pipeline completado'
         }
     }
 }
