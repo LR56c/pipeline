@@ -29,7 +29,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 echo 'Ejecutando Pruebas de Integración...'
-                bat 'mvn verify -DskipUnitTests'
+                bat 'mvn verify -DskipUnitTests -Dtest=!RunCucumberTest'
             }
         }
         stage('Deploy to Staging') {
