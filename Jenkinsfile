@@ -9,13 +9,13 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Iniciando etapa de Compilación...'
-                sh 'mvn clean package -DskipTests'
+                bat 'mvn clean package -DskipTests'
             }
         }
         stage('Unit Tests') {
             steps {
                 echo 'Ejecutando Pruebas Unitarias...'
-                sh 'mvn test'
+                bat 'mvn test'
             }
             post {
                 always {
