@@ -18,7 +18,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 echo 'Ejecutando Pruebas Unitarias...'
-                bat 'mvn test'
+                bat 'mvn test -Dtest=!RunCucumberTest'
             }
             post {
                 always {
@@ -45,7 +45,9 @@ pipeline {
         }
         stage('Acceptance Tests') {
             steps {
-                bat 'mvn test -Dcucumber.filter.tags="@acceptance"'
+                echo 'Esperando 10 segundos a que Spring Boot inicie completamente...'
+                sleep(time: 10, unit: "SECONDS")
+                bat 'mvn test -Dtest=RunCucumberTest'
             }
         }
         stage('Deploy to Production') {
