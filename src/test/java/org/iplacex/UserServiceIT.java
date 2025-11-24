@@ -1,13 +1,12 @@
+package org.iplacex;
 
-import org.iplacex.UserRepository;
-import org.iplacex.UserService;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserServiceIT {
 
     @Test
-    public void testIntegrationWithRealObject() {
+    public void saludoExitosoConUsuarioReal() {
         UserRepository realRepo = new UserRepository() {
             @Override
             public String findById(String id) {

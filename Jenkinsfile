@@ -29,5 +29,39 @@ pipeline {
                 bat 'mvn verify -DskipUnitTests'
             }
         }
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Desplegando contenedor en Staging'
+                script {
+                    bat "docker stop %CONTAINER_NAME% || exit 0"
+                    bat "docker rm %CONTAINER_NAME% || exit 0"
+                    bat "docker build -t %IMAGE_NAME%:v%BUILD_NUMBER% ."
+                    bat "docker run -d --name %CONTAINER_NAME% -p 8080:8080 %IMAGE_NAME%:v%BUILD_NUMBER%"
+                }
+            }
+        }
+        stage('Acceptance Tests') {
+            steps {
+                echo '--- Ejecutando Pruebas de Aceptacion (Cucumber BDD) ---'
+                bat 'mvn test -Dcucumber.filter.tags="@acceptance"'
+            }
+        }
+        stage('Deploy to Production') {
+            input {
+                message "Staging validado correctamente. ¿Autorizar pase a Producción?"
+                ok "Sí, Desplegar"
+            }
+            steps {
+                echo 'Desplegando en produccion'
+            }
+        }
+    }
+    post {
+        failure {
+            echo 'Iniciando Rollback'
+        }
+        success {
+            echo 'Pipeline completado'
+        }
     }
 }
